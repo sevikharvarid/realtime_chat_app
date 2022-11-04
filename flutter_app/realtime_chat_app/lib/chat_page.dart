@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:realtime_chat_app/message_model.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class APIConstants {
   static const String socketServerURL =
-      "https://real-time-chat-97.herokuapp.com";
+      // "https://real-time-chat-97.herokuapp.com";
+      "https://nodejs-chat-socketio.herokuapp.com";
 }
 
 class ChatPage extends StatefulWidget {
@@ -29,67 +31,69 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    messages = [];
-    textController = TextEditingController();
-    scrollController = ScrollController();
-    initSocket();
-    socketIO?.on('receive_message', (newMessage) {
-      Map<String, dynamic> data = json.decode(newMessage);
-      messages?.add(data['messages']);
+  getMessage() {
+    // socketIO?.on('receive_message', (newMessage) {
+    //   Map<String, dynamic> data = jsonDecode(newMessage);
+
+    //   print("Data : $newMessage");
+    //   messages?.add(data['messages']);
+    //   scrollController?.animateTo(
+    //     scrollController!.position.maxScrollExtent,
+    //     duration: Duration(milliseconds: 600),
+    //     curve: Curves.ease,
+    //   );
+    // });
+    socketIO?.on('getAllHistorical', (newMessage) {
+      Map<String, dynamic> data = jsonDecode(newMessage);
+
+      print("Data : $newMessage");
+      // messages?.add(data['messages']);
+      messages?.add(jsonEncode(data));
       scrollController?.animateTo(
         scrollController!.position.maxScrollExtent,
         duration: Duration(milliseconds: 600),
         curve: Curves.ease,
       );
     });
-    // socketIO = SocketIOManager().createSocketIO(
-    //   'https://real-time-chat-97.herokuapp.com',
-
-    //   // 'https://real-chat-1234.herokuapp.com',
-    //   '/',
-    // );
-    // socketIO.init();
-    // // socketIO.subscribe('receive_message', (jsonData) {
-    // //   Map<String, dynamic> data = json.decode(jsonData);
-    // //   this.setState(() => messages.add(data['message']));
-    // //   scrollController.animateTo(
-    // //     scrollController.position.maxScrollExtent,
-    // //     duration: Duration(milliseconds: 600),
-    // //     curve: Curves.ease,
-    // //   );
-    // // });
-    // socketIO.sendMessage('receive_message', _socketAlert());
-    // socketIO.connect();
-    // super.initState();
   }
 
-// initSocket() {
-//   socket = IO.io(APIConstants.socketServerURL, <String, dynamic>{
-//     'autoConnect': false,
-//     'transports': ['websocket'],
-//   });
-//   socket.connect();
-//   socket.onConnect((_) {
-//     print('Connection established');
-//   });
-//   socket.onDisconnect((_) => print('Connection Disconnection'));
-//   socket.onConnectError((err) => print(err));
-//   socket.onError((err) => print(err));
-// }
+  @override
+  void initState() {
+    messages = [];
+    textController = TextEditingController();
+    scrollController = ScrollController();
+    initSocket();
+    getMessage();
+  }
+
   initSocket() {
     socketIO = IO.io(APIConstants.socketServerURL, <String, dynamic>{
-      'autoConnect': false,
+      'autoConnect': true,
       'transports': ['websocket'],
     });
     socketIO?.connect();
+    Map testing = {"messages": "test", "id": 1};
+    // socketIO?.emit("send_message", jsonEncode(testing));
+    socketIO?.emit("joinRoom", jsonEncode(testing));
     socketIO?.onConnect((_) {
       print("Connection Established");
     });
     socketIO?.onDisconnect((_) => print('Connection Disconnection'));
-    socketIO?.onConnectError((err) => print(err));
-    socketIO?.onError((err) => print(err));
+    socketIO?.onConnectError((err) => print("Connect Error $err"));
+    socketIO?.onError((err) => print("Error $err"));
+
+    socketIO?.on('getAllHistorical', (newMessage) {
+      Map<String, dynamic> data = jsonDecode(newMessage);
+
+      print("Data : $newMessage");
+      // messages?.add(data['messages']);
+      messages?.add(jsonEncode(data));
+      scrollController?.animateTo(
+        scrollController!.position.maxScrollExtent,
+        duration: Duration(milliseconds: 600),
+        curve: Curves.ease,
+      );
+    });
   }
 
   Widget buildSingleMessage(int index) {
@@ -166,12 +170,15 @@ class _ChatPageState extends State<ChatPage> {
     String message = textController!.text.trim();
     if (message.isEmpty) return;
     Map messageMap = {
-      'message': message,
+      'id': 1,
+      'messages': message,
       // 'senderId': userId,
       // 'receiverId': receiverId,
-      'time': DateTime.now().millisecondsSinceEpoch,
+      // 'time': DateTime.now().millisecondsSinceEpoch,
     };
-    socketIO?.emit('send_message', messageMap);
+
+    // socketIO?.emit('send_message', jsonEncode(messageMap));
+    socketIO?.emit('joinRoom', jsonEncode(messageMap));
   }
 
   Widget buildInputArea() {
