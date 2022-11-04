@@ -2,7 +2,7 @@ const app = require("express")();
 const http = require("http").createServer(app);
 
 app.get("/", (req, res) => {
-  res.send("Node server is running ...");
+  res.send("Node server is running now ...");
 });
 
 const socketio = require("socket.io")(http);
