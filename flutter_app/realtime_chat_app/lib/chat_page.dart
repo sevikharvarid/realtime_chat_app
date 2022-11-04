@@ -6,8 +6,8 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class APIConstants {
   static const String socketServerURL =
-      "https://real-time-chat-97.herokuapp.com";
-  // "https://nodejs-chat-socketio.herokuapp.com";
+      // "https://real-time-chat-97.herokuapp.com";
+      "https://nodejs-chat-socketio.herokuapp.com";
 }
 
 class ChatPage extends StatefulWidget {
@@ -32,24 +32,15 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   getMessage() {
-    // socketIO?.on('receive_message', (newMessage) {
-    //   Map<String, dynamic> data = jsonDecode(newMessage);
-
-    //   print("Data : $newMessage");
-    //   messages?.add(data['messages']);
-    //   scrollController?.animateTo(
-    //     scrollController!.position.maxScrollExtent,
-    //     duration: Duration(milliseconds: 600),
-    //     curve: Curves.ease,
-    //   );
-    // });
-    socketIO?.on('receive_message', (newMessage) {
-      Map<String, dynamic> data = jsonDecode(newMessage);
+    socketIO?.on('getAllHistorical', (newMessage) {
+      // socketIO?.on('receive_message', (newMessage) {
+      // Map<String, dynamic> data = jsonDecode(newMessage);
 
       print("Data : $newMessage");
       // messages?.add(data['messages']);
+      messages?.add(jsonEncode(newMessage));
 
-      messages?.add("value");
+      // messages?.add("value");
       // messages?.add(jsonEncode(data));
       setState(() {});
       scrollController?.animateTo(
@@ -75,9 +66,6 @@ class _ChatPageState extends State<ChatPage> {
       'transports': ['websocket'],
     });
     socketIO?.connect();
-    Map testing = {"messages": "test", "id": 1};
-    socketIO?.emit("send_message", jsonEncode(testing));
-    // socketIO?.emit("joinRoom", jsonEncode(testing));
     socketIO?.onConnect((_) {
       print("Connection Established");
     });
@@ -167,8 +155,8 @@ class _ChatPageState extends State<ChatPage> {
       // 'time': DateTime.now().millisecondsSinceEpoch,
     };
 
-    socketIO?.emit('send_message', jsonEncode(messageMap));
-    // socketIO?.emit('joinRoom', jsonEncode(messageMap));
+    // socketIO?.emit('send_message', jsonEncode(messageMap));
+    socketIO?.emit('joinRoom', jsonEncode(messageMap));
   }
 
   Widget buildInputArea() {
