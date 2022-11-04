@@ -9,8 +9,8 @@ const socketio = require("socket.io")(http);
 
 socketio.on("connection", (userSocket) => {
   userSocket.on("send_message", (data) => {
-    // userSocket.broadcast.emit("receive_message", data);
-    userSocket.emit("receive_message", data);
+    userSocket.broadcast.emit("receive_message", data);
+    // userSocket.emit("receive_message", data);
   });
 });
 

@@ -6,8 +6,8 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class APIConstants {
   static const String socketServerURL =
-      // "https://real-time-chat-97.herokuapp.com";
-      "https://nodejs-chat-socketio.herokuapp.com";
+      "https://real-time-chat-97.herokuapp.com";
+  // "https://nodejs-chat-socketio.herokuapp.com";
 }
 
 class ChatPage extends StatefulWidget {
@@ -43,12 +43,15 @@ class _ChatPageState extends State<ChatPage> {
     //     curve: Curves.ease,
     //   );
     // });
-    socketIO?.on('getAllHistorical', (newMessage) {
+    socketIO?.on('receive_message', (newMessage) {
       Map<String, dynamic> data = jsonDecode(newMessage);
 
       print("Data : $newMessage");
       // messages?.add(data['messages']);
-      messages?.add(jsonEncode(data));
+
+      messages?.add("value");
+      // messages?.add(jsonEncode(data));
+      setState(() {});
       scrollController?.animateTo(
         scrollController!.position.maxScrollExtent,
         duration: Duration(milliseconds: 600),
@@ -73,27 +76,14 @@ class _ChatPageState extends State<ChatPage> {
     });
     socketIO?.connect();
     Map testing = {"messages": "test", "id": 1};
-    // socketIO?.emit("send_message", jsonEncode(testing));
-    socketIO?.emit("joinRoom", jsonEncode(testing));
+    socketIO?.emit("send_message", jsonEncode(testing));
+    // socketIO?.emit("joinRoom", jsonEncode(testing));
     socketIO?.onConnect((_) {
       print("Connection Established");
     });
     socketIO?.onDisconnect((_) => print('Connection Disconnection'));
     socketIO?.onConnectError((err) => print("Connect Error $err"));
     socketIO?.onError((err) => print("Error $err"));
-
-    socketIO?.on('getAllHistorical', (newMessage) {
-      Map<String, dynamic> data = jsonDecode(newMessage);
-
-      print("Data : $newMessage");
-      // messages?.add(data['messages']);
-      messages?.add(jsonEncode(data));
-      scrollController?.animateTo(
-        scrollController!.position.maxScrollExtent,
-        duration: Duration(milliseconds: 600),
-        curve: Curves.ease,
-      );
-    });
   }
 
   Widget buildSingleMessage(int index) {
@@ -177,8 +167,8 @@ class _ChatPageState extends State<ChatPage> {
       // 'time': DateTime.now().millisecondsSinceEpoch,
     };
 
-    // socketIO?.emit('send_message', jsonEncode(messageMap));
-    socketIO?.emit('joinRoom', jsonEncode(messageMap));
+    socketIO?.emit('send_message', jsonEncode(messageMap));
+    // socketIO?.emit('joinRoom', jsonEncode(messageMap));
   }
 
   Widget buildInputArea() {
