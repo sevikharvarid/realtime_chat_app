@@ -6,8 +6,8 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class APIConstants {
   static const String socketServerURL =
-      // "https://real-time-chat-97.herokuapp.com";
-      "https://nodejs-chat-socketio.herokuapp.com";
+      "https://real-time-chat-97.herokuapp.com";
+  // "https://nodejs-chat-socketio.herokuapp.com";
 }
 
 class ChatPage extends StatefulWidget {
@@ -32,13 +32,13 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   getMessage() {
-    socketIO?.on('getAllHistorical', (newMessage) {
-      // socketIO?.on('receive_message', (newMessage) {
+    // socketIO?.on('getAllHistorical', (newMessage) {
+    socketIO?.on('receive_message', (newMessage) {
       // Map<String, dynamic> data = jsonDecode(newMessage);
 
-      print("Data : $newMessage");
+      print("Data : ${newMessage.runtimeType}");
       // messages?.add(data['messages']);
-      messages?.add(jsonEncode(newMessage));
+      messages?.add(newMessage['messages']);
 
       // messages?.add("value");
       // messages?.add(jsonEncode(data));
@@ -155,8 +155,8 @@ class _ChatPageState extends State<ChatPage> {
       // 'time': DateTime.now().millisecondsSinceEpoch,
     };
 
-    // socketIO?.emit('send_message', jsonEncode(messageMap));
-    socketIO?.emit('joinRoom', jsonEncode(messageMap));
+    socketIO?.emit('send_message', jsonEncode(messageMap));
+    // socketIO?.emit('joinRoom', jsonEncode(messageMap));
   }
 
   Widget buildInputArea() {
